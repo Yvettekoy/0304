@@ -1,28 +1,28 @@
 import React, { useState } from 'react';
 import './App.css';
 
-// 靜態的 users 陣列，包含帳號、密碼和名稱
-const users = [
-  {
-    id: 1,
-    name: 'John Doe',
-    account: 'john.doe',
-    password: 'password123',
-  },
-  {
-    id: 2,
-    name: 'Jane Smith',
-    account: 'jane.smith',
-    password: 'password456',
-  },
-];
-
 const App = () => {
+  // 將 users 改為 useState 以便更新
+  const [users, setUsers] = useState([
+    {
+      id: 1,
+      name: 'John Doe',
+      account: 'john.doe',
+      password: 'password123',
+    },
+    {
+      id: 2,
+      name: 'Jane Smith',
+      account: 'jane.smith',
+      password: 'password456',
+    },
+  ]);
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);  // 目前登入的使用者資料
+  const [currentUser, setCurrentUser] = useState(null); // 目前登入的使用者資料
   const [newName, setNewName] = useState('');
   const [newPassword, setNewPassword] = useState('');
 
@@ -36,7 +36,7 @@ const App = () => {
 
     if (user) {
       setIsLoggedIn(true);
-      setCurrentUser(user);  // 記錄目前登入的使用者
+      setCurrentUser(user); // 記錄目前登入的使用者
       setErrorMessage('');
     } else {
       setIsLoggedIn(false);
@@ -56,58 +56,26 @@ const App = () => {
     alert('資料已更新');
   };
 
-  // 處理刪除使用者帳號
-  const handleDelete = () => {
-    const index = users.findIndex((user) => user.id === currentUser.id);
-    if (index > -1) {
-      // 刪除該帳號
-      users.splice(index, 1);
-      setIsLoggedIn(false);  // 登出
-      setCurrentUser(null);  // 清除目前登入的使用者
-      setErrorMessage('');
-      alert('帳號已刪除');
-    }
+  // 處理登出
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setCurrentUser(null); // 清除目前登入的使用者
+    setUsername('');
+    setPassword('');
+    setErrorMessage('');
+  };
+
+  // 註冊新帳號
+  const handleRegister = (newUser) => {
+    setUsers([...users, newUser]);
   };
 
   return (
     <div className="App">
       <h1>React 登入系統</h1>
 
-      {/* 顯示所有帳號及密碼 */}
-      <h2>所有帳號資料</h2>
-      <ul>
-        {users.map((user) => (
-          <li key={user.id}>
-            <strong>帳號:</strong> {user.account}, <strong>密碼:</strong> {user.password}
-          </li>
-        ))}
-      </ul>
-
-      {isLoggedIn ? (
-        <div>
-          <h2>歡迎，{currentUser.name}！</h2>
-          <h3>修改或刪除帳號資料</h3>
-          <div>
-            <label>新名稱:</label>
-            <input
-              type="text"
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-            />
-          </div>
-          <div>
-            <label>新密碼:</label>
-            <input
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-            />
-          </div>
-          <button onClick={handleUpdate}>更新資料</button>
-          <button onClick={handleDelete}>刪除帳號</button>
-          <button onClick={() => setIsLoggedIn(false)}>登出</button>
-        </div>
-      ) : (
+      {/* 顯示登入表單 */}
+      {!isLoggedIn ? (
         <form onSubmit={handleLogin}>
           <div>
             <label>帳號:</label>
@@ -129,6 +97,30 @@ const App = () => {
           </div>
           <button type="submit">登入</button>
         </form>
+      ) : (
+        // 登入後顯示的內容
+        <div>
+          <h2>歡迎，{currentUser.name}！</h2>
+          <h3>修改帳號資料</h3>
+          <div>
+            <label>新名稱:</label>
+            <input
+              type="text"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+            />
+          </div>
+          <div>
+            <label>新密碼:</label>
+            <input
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
+          </div>
+          <button onClick={handleUpdate}>更新資料</button>
+          <button onClick={handleLogout}>登出</button>
+        </div>
       )}
 
       {errorMessage && <p className="error">{errorMessage}</p>}
